@@ -87,14 +87,14 @@
 <meta property="og:site_name" content="BluesJiang">
 <meta property="og:description" content="机器学习的一维线性回归，从基本原理到学习方法的求法以及过程全展现。表现了基本的机器学习流程。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://bluesjiang.coding.me/2017/11/03/深度学习入门笔记-一-一维线性回归/data_sample.png">
-<meta property="og:image" content="https://bluesjiang.coding.me/2017/11/03/深度学习入门笔记-一-一维线性回归/loss_sample.png">
-<meta property="og:image" content="https://bluesjiang.coding.me/2017/11/03/深度学习入门笔记-一-一维线性回归/result_sample.png">
+<meta property="og:image" content="https://bluesjiang.coding.me/深度学习入门笔记-一-一维线性回归/data_sample.png">
+<meta property="og:image" content="https://bluesjiang.coding.me/深度学习入门笔记-一-一维线性回归/loss_sample.png">
+<meta property="og:image" content="https://bluesjiang.coding.me/深度学习入门笔记-一-一维线性回归/result_sample.png">
 <meta property="og:updated_time" content="2017-11-04T04:35:33.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="深度学习入门笔记(一)---一维线性回归">
 <meta name="twitter:description" content="机器学习的一维线性回归，从基本原理到学习方法的求法以及过程全展现。表现了基本的机器学习流程。">
-<meta name="twitter:image" content="https://bluesjiang.coding.me/2017/11/03/深度学习入门笔记-一-一维线性回归/data_sample.png">
+<meta name="twitter:image" content="https://bluesjiang.coding.me/深度学习入门笔记-一-一维线性回归/data_sample.png">
 
 
 
@@ -390,7 +390,7 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</div></pre></td></tr></table></figure>
 <p>生成训练数据，标准的 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mi>w</mi><mrow><mi mathvariant="normal">′</mi></mrow></msup><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">w&#x27;=1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.751892em;"></span><span class="strut bottom" style="height:0.751892em;vertical-align:0em;"></span><span class="base textstyle uncramped"><span class="mord"><span class="mord mathit" style="margin-right:0.02691em;">w</span><span class="vlist"><span style="top:-0.363em;margin-right:0.05em;"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span><span class="reset-textstyle scriptstyle uncramped"><span class="mord scriptstyle uncramped"><span class="mord mathrm">′</span></span></span></span><span class="baseline-fix"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span>​</span></span></span><span class="mrel">=</span><span class="mord mathrm">1</span></span></span></span></p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">W_ = <span class="number">1.0</span></div><div class="line">data_size = <span class="number">20</span></div><div class="line">X = np.linspace(<span class="number">0</span>, <span class="number">10</span>, data_size+<span class="number">1</span>)</div><div class="line">Y = W_*X</div><div class="line">plt.scatter(X, Y)</div><div class="line">plt.show()</div></pre></td></tr></table></figure>
-<img src="/2017/11/03/深度学习入门笔记-一-一维线性回归/data_sample.png" class="slug">
+<img src="/深度学习入门笔记-一-一维线性回归/data_sample.png" class="slug">
 <p>初始化待训练的数据</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">w = <span class="number">0</span>			<span class="comment">#待训练的参数w</span></div></pre></td></tr></table></figure>
 <p>训练代码：</p>
@@ -427,10 +427,10 @@ x, wx-y&#x27;&gt;0 \\
 <p>即向 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>l</mi><mi>o</mi><mi>s</mi><mi>s</mi></mrow><annotation encoding="application/x-tex">loss</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.69444em;"></span><span class="strut bottom" style="height:0.69444em;vertical-align:0em;"></span><span class="base textstyle uncramped"><span class="mord mathit" style="margin-right:0.01968em;">l</span><span class="mord mathit">o</span><span class="mord mathit">s</span><span class="mord mathit">s</span></span></span></span> 导数的负方向移动一小步，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>ϵ</mi></mrow><annotation encoding="application/x-tex">\epsilon</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.43056em;"></span><span class="strut bottom" style="height:0.43056em;vertical-align:0em;"></span><span class="base textstyle uncramped"><span class="mord mathit">ϵ</span></span></span></span> 就是上面代码中的学习率(leaning rate)</p>
 <p>我们在代码中用<code>loss_per_step</code>记录了每一步的 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>l</mi><mi>o</mi><mi>s</mi><mi>s</mi></mrow><annotation encoding="application/x-tex">loss</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.69444em;"></span><span class="strut bottom" style="height:0.69444em;vertical-align:0em;"></span><span class="base textstyle uncramped"><span class="mord mathit" style="margin-right:0.01968em;">l</span><span class="mord mathit">o</span><span class="mord mathit">s</span><span class="mord mathit">s</span></span></span></span> 变化，用以下代码展示出来：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">steps = np.linspace(<span class="number">0</span>, step_num, len(loss_per_step))</div><div class="line">plt.plot(steps, loss_per_step)</div><div class="line">plt.show()</div></pre></td></tr></table></figure>
-<img src="/2017/11/03/深度学习入门笔记-一-一维线性回归/loss_sample.png">
+<img src="/深度学习入门笔记-一-一维线性回归/loss_sample.png">
 <p>现在看看我们的拟合结果：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Y_ = w*X</div><div class="line">plt.scatter(X, Y)</div><div class="line">plt.plot(X, Y_)</div><div class="line">plt.show()</div></pre></td></tr></table></figure>
-<img src="/2017/11/03/深度学习入门笔记-一-一维线性回归/result_sample.png">
+<img src="/深度学习入门笔记-一-一维线性回归/result_sample.png">
 <p>从最后的结果来看，我们的计算机成功的找(xue)到(xi)到了这个 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>w</mi></mrow><annotation encoding="application/x-tex">w</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.43056em;"></span><span class="strut bottom" style="height:0.43056em;vertical-align:0em;"></span><span class="base textstyle uncramped"><span class="mord mathit" style="margin-right:0.02691em;">w</span></span></span></span> 下一次我们试试更高维的线性回归</p>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/flowchart/1.6.5/flowchart.min.js"></script><textarea id="flowchart-0-code" style="display: none">st=>start: 开始
 e=>end: 结束
@@ -570,7 +570,7 @@ cond(no)->data</textarea><textarea id="flowchart-0-options" style="display: none
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -581,7 +581,7 @@ cond(no)->data</textarea><textarea id="flowchart-0-options" style="display: none
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-count">2</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -592,7 +592,7 @@ cond(no)->data</textarea><textarea id="flowchart-0-options" style="display: none
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

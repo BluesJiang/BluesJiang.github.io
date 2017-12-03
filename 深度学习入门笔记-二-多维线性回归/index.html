@@ -87,12 +87,12 @@
 <meta property="og:site_name" content="BluesJiang">
 <meta property="og:description" content="本篇将前一篇的方法进行扩展，得到了更加一般的线性回归的求解办法，而且初步展示了梯度下降的工作原理以及情况。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://bluesjiang.coding.me/2017/11/03/深度学习入门笔记-二-多维线性回归/loss_sample.png">
+<meta property="og:image" content="https://bluesjiang.coding.me/深度学习入门笔记-二-多维线性回归/loss_sample.png">
 <meta property="og:updated_time" content="2017-11-06T11:36:48.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="深度学习入门笔记(二)---多维线性回归">
 <meta name="twitter:description" content="本篇将前一篇的方法进行扩展，得到了更加一般的线性回归的求解办法，而且初步展示了梯度下降的工作原理以及情况。">
-<meta name="twitter:image" content="https://bluesjiang.coding.me/2017/11/03/深度学习入门笔记-二-多维线性回归/loss_sample.png">
+<meta name="twitter:image" content="https://bluesjiang.coding.me/深度学习入门笔记-二-多维线性回归/loss_sample.png">
 
 
 
@@ -466,7 +466,7 @@ Jacobi=\left[
 <p>已经足够接近了，如果我们把学习率调整得更低，训练的步数再适当调高，就可以得到更精确的值。</p>
 <p>让我们看loss的变化情况</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">steps = np.array(range(len(loss_per_step)))</div><div class="line">plt.plot(steps, loss_per_step)</div><div class="line">plt.show()</div></pre></td></tr></table></figure>
-<img src="/2017/11/03/深度学习入门笔记-二-多维线性回归/loss_sample.png">
+<img src="/深度学习入门笔记-二-多维线性回归/loss_sample.png">
 <p>loss虽然有很多抖动，但是总体的趋势在不断减小的，最后趋向与0。</p>
 <h1 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h1>
 <p>这次我们看到了机器在进行学习多维线性方程的时候的表现，但是我们不禁会问，那么之前提到的形如：</p>
@@ -617,7 +617,7 @@ W &amp;= \left[
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -628,7 +628,7 @@ W &amp;= \left[
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-count">2</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -639,7 +639,7 @@ W &amp;= \left[
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
