@@ -4,12 +4,12 @@
 
     
   <url>
-    <loc>https://bluesjiang.coding.me/%E7%AE%97%E6%B3%95%E4%B8%8A%E6%9C%BA%E5%AE%9E%E9%AA%8C-%E7%9F%A9%E9%98%B5%E4%B9%98%E6%B3%95/</loc>
-    <lastmod>2017-12-04T03:44:41.174Z</lastmod>
+    <loc>https://bluesjiang.coding.me/%E7%AE%97%E6%B3%95%E4%B8%8A%E6%9C%BA%E5%AE%9E%E9%AA%8C-%E6%9C%80%E8%BF%91%E7%82%B9%E5%AF%B9/</loc>
+    <lastmod>2017-12-04T07:58:04.315Z</lastmod>
     <data>
         <display>
-        <title>算法上机实验----矩阵乘法</title>
-        <pubTime>2017-12-04T03:06:00.000Z</pubTime>
+        <title>算法上机实验----最近点对</title>
+        <pubTime>2017-12-04T07:49:00.000Z</pubTime>
         
         <tag>算法</tag>
          
@@ -27,13 +27,37 @@
     
   <url>
     <loc>https://bluesjiang.coding.me/%E7%AE%97%E6%B3%95%E4%B8%8A%E6%9C%BA%E5%AE%9E%E9%AA%8C-%E5%90%84%E7%A7%8D%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/</loc>
-    <lastmod>2017-12-04T03:44:22.523Z</lastmod>
+    <lastmod>2017-12-04T04:46:16.906Z</lastmod>
     <data>
         <display>
-        <title>算法上机试验----各种排序算法</title>
+        <title>算法上机实验----各种排序算法</title>
         <pubTime>2017-12-03T07:34:00.000Z</pubTime>
         
-        <tag>算法 上机内容</tag>
+        <tag>算法</tag>
+         
+        <tag>上机内容</tag>
+         
+         
+           
+             
+              <breadCrumb title="算法" url="https://bluesjiang.coding.me/categories/%E7%AE%97%E6%B3%95/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://bluesjiang.coding.me/%E7%AE%97%E6%B3%95%E4%B8%8A%E6%9C%BA%E5%AE%9E%E9%AA%8C-%E7%9F%A9%E9%98%B5%E4%B9%98%E6%B3%95/</loc>
+    <lastmod>2017-12-04T03:44:41.174Z</lastmod>
+    <data>
+        <display>
+        <title>算法上机实验----矩阵乘法</title>
+        <pubTime>2017-12-04T03:06:00.000Z</pubTime>
+        
+        <tag>算法</tag>
+         
+        <tag>上机内容</tag>
          
          
            
