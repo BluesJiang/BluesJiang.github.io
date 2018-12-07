@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="源码阅读," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="规范 Promise/A+  PromiseKit - Swift 实现  Box and Result Promise 最终的结果一定反映出两个状态，所以 PromisKit 定义了以下的 Result 枚举 1234public enum Result&amp;lt;T&amp;gt; &amp;#123;    case fulfilled(T)    case rejected(Error)&amp;#125; Res">
+<meta name="keywords" content="源码阅读">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PromiseKit 源码初探（一）">
+<meta property="og:url" content="https://bluesjiang.coding.me/PromiseKit-源码初探（一）/index.html">
+<meta property="og:site_name" content="BluesJiang">
+<meta property="og:description" content="规范 Promise/A+  PromiseKit - Swift 实现  Box and Result Promise 最终的结果一定反映出两个状态，所以 PromisKit 定义了以下的 Result 枚举 1234public enum Result&amp;lt;T&amp;gt; &amp;#123;    case fulfilled(T)    case rejected(Error)&amp;#125; Res">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-12-07T12:33:04.727Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PromiseKit 源码初探（一）">
+<meta name="twitter:description" content="规范 Promise/A+  PromiseKit - Swift 实现  Box and Result Promise 最终的结果一定反映出两个状态，所以 PromisKit 定义了以下的 Result 枚举 1234public enum Result&amp;lt;T&amp;gt; &amp;#123;    case fulfilled(T)    case rejected(Error)&amp;#125; Res">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://bluesjiang.coding.me/PromiseKit-源码初探（一）/"/>
+
+
+
+
+
+<meta name="baidu-site-verification" content="84JyTny968" />
+
+
+  <title>PromiseKit 源码初探（一） | BluesJiang</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?0a6938376c62cf496032c7169aa31e64";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">BluesJiang</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://bluesjiang.coding.me/PromiseKit-源码初探（一）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="BluesJiang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="BluesJiang">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">PromiseKit 源码初探（一）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-02T19:56:01+08:00">
+                2018-08-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS开发/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="规范"><a class="markdownIt-Anchor" href="#规范"></a> 规范</h2>
+<p><a href="https://promisesaplus.com/" target="_blank" rel="external">Promise/A+</a></p>
+<h2 id="promisekit-swift-实现"><a class="markdownIt-Anchor" href="#promisekit-swift-实现"></a> PromiseKit - Swift 实现</h2>
+<h3 id="box-and-result"><a class="markdownIt-Anchor" href="#box-and-result"></a> Box and Result</h3>
+<p>Promise 最终的结果一定反映出两个状态，所以 PromisKit 定义了以下的 Result 枚举</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">enum</span> <span class="title">Result</span>&lt;<span class="title">T</span>&gt; </span>&#123;</div><div class="line">    <span class="keyword">case</span> fulfilled(<span class="type">T</span>)</div><div class="line">    <span class="keyword">case</span> rejected(<span class="type">Error</span>)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>Result</code> 类型一定要把它看作最终的结果。</p>
+<a id="more"></a>
+<p>Promise 自身还有两个状态，pending(等待执行) 以及 resolved(执行完毕)<br>
+虽然在 PromiseKit 中有一个基类 <code>Box</code> 作为非正式协议使用</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Box</span>&lt;<span class="title">T</span>&gt; </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">inspect</span><span class="params">()</span></span> -&gt; <span class="type">Sealant</span>&lt;<span class="type">T</span>&gt; &#123; <span class="built_in">fatalError</span>() &#125;</div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">inspect</span><span class="params">(<span class="number">_</span>: <span class="params">(Sealant&lt;T&gt;)</span></span></span> -&gt; <span class="type">Void</span>) &#123; <span class="built_in">fatalError</span>() &#125;</div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">seal</span><span class="params">(<span class="number">_</span>: T)</span></span> &#123;&#125;<span class="comment">// 此函数执行以后会使内部的状态发生改变，即由 pending 态转换为 resolve 态</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>Box</code> 中装了一个内部的类型 <code>Sealant</code></p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">enum</span> <span class="title">Sealant</span>&lt;<span class="title">R</span>&gt; </span>&#123;</div><div class="line">    <span class="keyword">case</span> pending(<span class="type">Handlers</span>&lt;<span class="type">R</span>&gt;)</div><div class="line">    <span class="keyword">case</span> resolved(<span class="type">R</span>)</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Handlers</span>&lt;<span class="title">R</span>&gt; </span>&#123;</div><div class="line">    <span class="keyword">var</span> bodies: [(<span class="type">R</span>) -&gt; <span class="type">Void</span>] = []</div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">append</span><span class="params">(<span class="number">_</span> item: @escaping<span class="params">(R)</span></span></span> -&gt; <span class="type">Void</span>) &#123; bodies.append(item) &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>Handlers 包装的是一些内部使用的函数，内部逻辑基本上是将当 <code>then</code> 中返回的 <code>Promise</code> 的状态传递到 <code>then</code> 返回的 <code>Promise</code> 中，见规范 2.3</p>
+<h3 id="resolver"><a class="markdownIt-Anchor" href="#resolver"></a> Resolver</h3>
+<p><code>Resolver</code> 是作为提供给 <code>Promise</code> 包装函数使用，用于触发 <code>Promise</code> 的工具，它基本提供的方法如下</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Resolver</span>&lt;<span class="title">T</span>&gt; </span>&#123;</div><div class="line">    <span class="keyword">let</span> box: <span class="type">Box</span>&lt;<span class="type">Result</span>&lt;<span class="type">T</span>&gt;&gt;</div><div class="line">    <span class="keyword">init</span>(<span class="number">_</span> box: <span class="type">Box</span>&lt;<span class="type">Result</span>&lt;<span class="type">T</span>&gt;&gt;) &#123; <span class="keyword">self</span>.box = box &#125;</div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">fulfill</span><span class="params">(<span class="number">_</span> value: T)</span></span> &#123; box.seal(.fulfilled(value)) &#125;</div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">reject</span><span class="params">(<span class="number">_</span> error:Error)</span></span> &#123; box.seal(.reject(error)) &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>fulfill</code> 当包装函数执行成功时调用<br>
+<code>reject</code> 当保障函数执行失败时调用</p>
+<h3 id="thenable"><a class="markdownIt-Anchor" href="#thenable"></a> Thenable</h3>
+<blockquote>
+<p>“thenable” is an object or function that defines a <code>then</code> method.</p>
+</blockquote>
+<p>PromiseKit 定义了如下接口</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">protocol</span> <span class="title">Thenable</span>: <span class="title">class</span> </span>&#123;</div><div class="line">    <span class="comment">/// The type of the wrapped value</span></div><div class="line">    associatedtype <span class="type">T</span></div><div class="line"></div><div class="line">    <span class="comment">/// `pipe` is immediately executed when this `Thenable` is resolved</span></div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">pipe</span><span class="params">(to: @escaping<span class="params">(Result&lt;T&gt;)</span></span></span> -&gt; <span class="type">Void</span>)</div><div class="line"></div><div class="line">    <span class="comment">/// The resolved result or nil if pending.</span></div><div class="line">    <span class="keyword">var</span> result: <span class="type">Result</span>&lt;<span class="type">T</span>&gt;? &#123; <span class="keyword">get</span> &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>pipe</code> 将传入的函数放入到待执行队列中。如果 Promise 已经完成，则立即执行传入的函数。</p>
+<p>PromiseKit 提供了一下 <code>then</code> 方法的默认实现</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">then</span>&lt;U: Thenable&gt;<span class="params">(on: DispatchQueue? = conf.Q.<span class="built_in">map</span>, flags: DispatchWorkItemFlags? = <span class="literal">nil</span>, <span class="number">_</span> body: @escaping<span class="params">(T)</span></span></span> <span class="keyword">throws</span> -&gt; <span class="type">U</span>) -&gt; <span class="type">Promise</span>&lt;<span class="type">U</span>.<span class="type">T</span>&gt; &#123;</div><div class="line">    <span class="keyword">let</span> rp = <span class="type">Promise</span>&lt;<span class="type">U</span>.<span class="type">T</span>&gt;(.pending)</div><div class="line">    pipe &#123;</div><div class="line">        <span class="keyword">switch</span> $<span class="number">0</span> &#123;</div><div class="line">        <span class="keyword">case</span> .fulfilled(<span class="keyword">let</span> value):</div><div class="line">            on.async(flags: flags) &#123;</div><div class="line">                <span class="keyword">do</span> &#123;</div><div class="line">                    <span class="keyword">let</span> rv = <span class="keyword">try</span> body(value)</div><div class="line">                    <span class="keyword">guard</span> rv !== rp <span class="keyword">else</span> &#123; <span class="keyword">throw</span> <span class="type">PMKError</span>.returnedSelf &#125;</div><div class="line">                    rv.pipe(to: rp.box.seal)</div><div class="line">                &#125; <span class="keyword">catch</span> &#123;</div><div class="line">                    rp.box.seal(.rejected(error))</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        <span class="keyword">case</span> .rejected(<span class="keyword">let</span> error):</div><div class="line">            rp.box.seal(.rejected(error))</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> rp</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中 <code>fulfill</code> 的情况很有意思，摘录出来</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> rv = <span class="keyword">try</span> body(value)</div><div class="line"><span class="keyword">guard</span> rv !== rp <span class="keyword">else</span> &#123; <span class="keyword">throw</span> <span class="type">PMKError</span>.returnedSelf &#125;</div><div class="line">rv.pipe(to: rp.box.seal)</div></pre></td></tr></table></figure>
+<p>其中它调用了 <code>body</code> 满足了立即执行的要求，检查 <code>rv</code> 和 <code>rp</code> 是符合以下规则</p>
+<blockquote>
+<p>If <code>promise</code> and x refer to the same object, reject <code>promise</code> with a <code>TypeError</code> as the reason.</p>
+</blockquote>
+<p><code>rv.pipe(to: rp.box.seal)</code> 则巧妙的实现了 <code>2.3.2.1</code></p>
+<blockquote>
+<p>If x is pending, promise must remain pending until x is fulfilled or rejected</p>
+</blockquote>
+<h3 id="promise"><a class="markdownIt-Anchor" href="#promise"></a> Promise</h3>
+<p>一下是 PromiseKit 实现的简单版本</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Promise</span>&lt;<span class="title">T</span>&gt;: <span class="title">Thenable</span> </span>&#123;</div><div class="line">    <span class="keyword">var</span> box:<span class="type">Box</span>&lt;<span class="type">Result</span>&lt;<span class="type">T</span>&gt;&gt;</div><div class="line">    </div><div class="line">    <span class="keyword">init</span>() &#123; box = <span class="type">EmptyBox</span>() &#125;</div><div class="line">    </div><div class="line">    <span class="keyword">init</span>(resolver body: (<span class="type">Resolver</span>&lt;<span class="type">T</span>&gt;) <span class="keyword">throws</span> -&gt; <span class="type">Void</span>) &#123;</div><div class="line">        box = <span class="type">EmptyBox</span>()</div><div class="line">        <span class="keyword">let</span> resolver = <span class="type">Resolver</span>&lt;<span class="type">T</span>&gt;(box)</div><div class="line">        <span class="keyword">do</span> &#123;</div><div class="line">            <span class="keyword">try</span> body(resolver)</div><div class="line">        &#125; <span class="keyword">catch</span> &#123;</div><div class="line">            resolver.reject(error)</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">pip</span><span class="params">(to: @escaping <span class="params">(Result&lt;T&gt;)</span></span></span> -&gt; <span class="type">Void</span>) &#123;</div><div class="line">        <span class="keyword">switch</span> box.inspect() &#123;</div><div class="line">        <span class="keyword">case</span> .pending:</div><div class="line">            box.inspect &#123;</div><div class="line">                <span class="keyword">switch</span> $<span class="number">0</span> &#123;</div><div class="line">                <span class="keyword">case</span> .pending(<span class="keyword">let</span> handlers):</div><div class="line">                    handlers.append(to)</div><div class="line">                <span class="keyword">case</span> .resolved(<span class="keyword">let</span> value):</div><div class="line">                    to(value)</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        <span class="keyword">case</span> .resolved(<span class="keyword">let</span> value):</div><div class="line">            to(value)</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>核心的 pip 函数完成 Handler 的接驳工作，逻辑就是检查 <code>box</code> 中的内容是否是 <code>pending</code> 是则将接驳函数放入队列中；否则就立即执行，把结果给出去。</p>
+<h2 id="总览"><a class="markdownIt-Anchor" href="#总览"></a> 总览</h2>
+<p>综合看 <code>PromiseKit</code> 的类名很有意思，但是它提供了一个很好的比喻。</p>
+<p>每一个 <code>Promise</code> 都有一个 <code>Box</code> 来存储当前的状态以及被注册的 <code>Handler</code>。比如几个 <code>Promise</code> 用链式调用 <code>then</code> 方法可以得到如下的结果。<code>pipe()</code> 函数的公用就是连接两个 <code>Promise</code> 的 <code>box</code>， 同时 <code>pipe()</code> 也是一个开关，当 <code>Box</code> 没有打开的时候是不通的；当 <code>Box</code> <code>seal()</code> 的时候，<code>Box</code> 把其内容放出，下一个 <code>box</code> 中.</p>
+<pre class="mermaid">graph TD
+B1[Box1]  -."P1.then()".->  B2[Box2]
+B1 --"P1.pip()"--> Body(body)
+Body -."body()".-> B3[Box3]
+B3 --"P1.pip(to)"--> B2</pre>
+<p>上图展示了一个 <code>Promise</code> 调用一次 <code>then</code> 产生的几个 <code>Promise</code>的关系，实线表示 <code>Box</code> 的数据流向，虚线表示 <code>Promise</code> 产生的关系。<br>
+<code>Box</code> 释放出来的数据进入 <code>body()</code>，它产生了一个新的 <code>Promise</code> ，然后用关键的一句</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">rv.pipe(to: rp.box.seal)</div></pre></td></tr></table></figure>
+<p>让 <code>P3</code> 来控制 <code>P2</code> <code>Box2</code> 的释放，并将得到的数据传递给 <code>Box2</code> ，让 <code>Box2</code> <code>seal</code> 出去。</p>
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>看完感觉有很多可以学习的地方。</p>
+<ul>
+<li><code>enum</code> 的使用，完成了状态和值的绑定。</li>
+<li><code>Box</code> 和 <code>pipe</code> 的抽象很让人很容易理解</li>
+<li><code>extension protocol</code> 的使用，给 <code>protocol</code> 一个默认的实现，让拓展 <code>protocol</code> 更加方便，提供更便捷的 <code>protocol</code></li>
+</ul>
+<p>##参考资料</p>
+<ul>
+<li><a href="https://segmentfault.com/a/1190000002452115" target="_blank" rel="external">中文版翻译规范</a></li>
+<li><a href="https://promisesaplus.com/" target="_blank" rel="external">Promise/A+</a></li>
+<li><a href="https://github.com/mxcl/PromiseKit" target="_blank" rel="external">PromiseKit</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/源码阅读/" rel="tag"># 源码阅读</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/算法上机实验-单源-点对最短距离/" rel="next" title="算法上机实验----单源+点对最短距离">
+                <i class="fa fa-chevron-left"></i> 算法上机实验----单源+点对最短距离
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/SnapKit-源码阅读/" rel="prev" title="SnapKit 源码阅读">
+                SnapKit 源码阅读 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMTY4MS84MjQ1"></div>
+    </div>
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="BluesJiang" />
+            
+              <p class="site-author-name" itemprop="name">BluesJiang</p>
+              <p class="site-description motion-element" itemprop="description">A site to share MY learning journey</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/bluesjiang" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#规范"><span class="nav-number">1.</span> <span class="nav-text"> 规范</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#promisekit-swift-实现"><span class="nav-number">2.</span> <span class="nav-text"> PromiseKit - Swift 实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#box-and-result"><span class="nav-number">2.1.</span> <span class="nav-text"> Box and Result</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#resolver"><span class="nav-number">2.2.</span> <span class="nav-text"> Resolver</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#thenable"><span class="nav-number">2.3.</span> <span class="nav-text"> Thenable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#promise"><span class="nav-number">2.4.</span> <span class="nav-text"> Promise</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总览"><span class="nav-number">3.</span> <span class="nav-text"> 总览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text"> 总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">BluesJiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.3</div>
+
+
+
+
+
+  <script src='https://unpkg.com/mermaid@<%= theme.mermaid.version %>/dist/mermaid.min.js'></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize({theme: 'forest'});
+    }
+  </script>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

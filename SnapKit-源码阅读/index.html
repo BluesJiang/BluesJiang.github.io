@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="源码阅读," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="SnapKit SnapKit 是一个针对 iOS AutoLayout 的 Swift 版的 Domain Specific Language （DSL），它提供了一个 Swift 版的，对 AutoLayout 的良好封装，让 AutoLayout 更加平易近人。">
+<meta name="keywords" content="源码阅读">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SnapKit 源码阅读">
+<meta property="og:url" content="https://bluesjiang.coding.me/SnapKit-源码阅读/index.html">
+<meta property="og:site_name" content="BluesJiang">
+<meta property="og:description" content="SnapKit SnapKit 是一个针对 iOS AutoLayout 的 Swift 版的 Domain Specific Language （DSL），它提供了一个 Swift 版的，对 AutoLayout 的良好封装，让 AutoLayout 更加平易近人。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://bluesjiang.coding.me/SnapKit-源码阅读/15374128260822.jpg">
+<meta property="og:updated_time" content="2018-12-07T12:01:05.189Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SnapKit 源码阅读">
+<meta name="twitter:description" content="SnapKit SnapKit 是一个针对 iOS AutoLayout 的 Swift 版的 Domain Specific Language （DSL），它提供了一个 Swift 版的，对 AutoLayout 的良好封装，让 AutoLayout 更加平易近人。">
+<meta name="twitter:image" content="https://bluesjiang.coding.me/SnapKit-源码阅读/15374128260822.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://bluesjiang.coding.me/SnapKit-源码阅读/"/>
+
+
+
+
+
+<meta name="baidu-site-verification" content="84JyTny968" />
+
+
+  <title>SnapKit 源码阅读 | BluesJiang</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?0a6938376c62cf496032c7169aa31e64";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">BluesJiang</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://bluesjiang.coding.me/SnapKit-源码阅读/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="BluesJiang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="BluesJiang">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">SnapKit 源码阅读</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-20T19:53:48+08:00">
+                2018-09-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS开发/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="snapkit"><a class="markdownIt-Anchor" href="#snapkit"></a> SnapKit</h2>
+<p>SnapKit 是一个针对 iOS AutoLayout 的 Swift 版的 Domain Specific Language （DSL），它提供了一个 Swift 版的，对 AutoLayout 的良好封装，让 AutoLayout 更加平易近人。</p>
+<a id="more"></a>
+<h2 id="basic-usage"><a class="markdownIt-Anchor" href="#basic-usage"></a> Basic Usage</h2>
+<p>阅读源码前一定要先了解它的用法，我们才可以去探究它的实现。</p>
+<img src="/SnapKit-源码阅读/15374128260822.jpg">
+<p>以上图为例，View 的顶边底边，左边都是相对 Container 的对应边 20，View的右边距离 Button 的左边 20，高度为 50</p>
+<p>用 SnapKit 描述就是</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">view.snp.makeConstraints &#123; make <span class="keyword">in</span></div><div class="line">    make.<span class="keyword">left</span>.top.equalTo(container).offset(<span class="number">20.0</span>)</div><div class="line">    make.bottom.equalTo(container).offset(-<span class="number">20</span>)</div><div class="line">    make.<span class="keyword">right</span>.equalTo(button.snp.<span class="keyword">left</span>).offset(-<span class="number">20</span>)</div><div class="line">    make.height.equalTo(<span class="number">50</span>)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>以上就是基本用法，如此的设计大大减少了我们的代码量。</p>
+<h2 id="get-started"><a class="markdownIt-Anchor" href="#get-started"></a> Get Started</h2>
+<h3 id="snp"><a class="markdownIt-Anchor" href="#snp"></a> snp</h3>
+<p>SnapKit 比较优雅的一点就是使用了 <code>snp</code> 来实现非侵入式的拓展。</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">var</span> snp: <span class="type">ConstraintViewDSL</span> &#123;</div><div class="line">    <span class="keyword">return</span> <span class="type">ConstraintViewDSL</span>(view: <span class="keyword">self</span>)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>源代码中用 <code>snp</code> 这个计算变量用当前 View  初始化了一个 <code>ConstraintViewDSL</code> 结构体，然后所有的操作就跳脱了 View 的拓展，把工作都交给了 <code>ConstraintViewDSL</code>。</p>
+<p>这样的好处是可以避免写更多 View 的拓展，减少了模块对 View 拓展的依赖。</p>
+<h3 id="constraintviewdsl"><a class="markdownIt-Anchor" href="#constraintviewdsl"></a> ConstraintViewDSL</h3>
+<p>首先这个被声明成了结构体而不是类，其次，综管其上下，内部其实只有一个变量，即该 创建该结构体的类。<br>
+其中的关键方法</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">makeConstraints</span><span class="params">(<span class="number">_</span> closure: <span class="params">(<span class="number">_</span> make: ConstraintMaker)</span></span></span> -&gt; <span class="type">Void</span>) &#123;</div><div class="line">    <span class="type">ConstraintMaker</span>.makeConstraints(item: <span class="keyword">self</span>.view, closure: closure)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里把构建约束的工作交给了 <code>ConstraintMaker</code> 这个我们待会再说。</p>
+<p>我们看到使用的时候发现有一个 <code>button.snp.left</code> 的写法，这个的实现放在了 <code>ConstraintViewDSL</code> 遵循的协议 <code>ConstraintAttributesDSL</code> 的继承协议 <code>ConstraintBasicAttributesDSL</code> 的拓展实现中。具体实现如下：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">var</span> <span class="keyword">left</span>: <span class="type">ConstraintItem</span> &#123;</div><div class="line">    <span class="keyword">return</span> <span class="type">ConstraintItem</span>(target: <span class="keyword">self</span>.target, attributes: <span class="type">ConstraintAttributes</span>.<span class="keyword">left</span>)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个计算属性创建了一个 <code>ConstraintItem</code>，现在可以理解为一个约束的一部分，描述了一个约束的一部分，比一个对象的 left、right 等等。</p>
+<h3 id="constraintmaker"><a class="markdownIt-Anchor" href="#constraintmaker"></a> ConstraintMaker</h3>
+<p>我们回到 <code>ConstraintMaker</code> ，核心方法：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Note: 这里是静态的方法</span></div><div class="line"><span class="keyword">internal</span> <span class="keyword">static</span> <span class="function"><span class="keyword">func</span> <span class="title">prepareConstraints</span><span class="params">(item: LayoutConstraintItem, closure: <span class="params">(<span class="number">_</span> make: ConstraintMaker)</span></span></span> -&gt; <span class="type">Void</span>) -&gt; [<span class="type">Constraint</span>] &#123;</div><div class="line">    <span class="comment">// 这里创建了 ConstraintMaker 的实例</span></div><div class="line">    <span class="keyword">let</span> maker = <span class="type">ConstraintMaker</span>(item: item)</div><div class="line">    </div><div class="line">    <span class="comment">// 这个内部便是我们配置 maker 的过程</span></div><div class="line">    closure(maker)</div><div class="line">    </div><div class="line">    <span class="keyword">var</span> constraints: [<span class="type">Constraint</span>] = []</div><div class="line">    </div><div class="line">    <span class="comment">// 提取配置好的约束描述</span></div><div class="line">    <span class="keyword">for</span> description <span class="keyword">in</span> maker.descriptions &#123;</div><div class="line">         <span class="comment">// description.constraint 便生成了对应的约束（懒加载）</span></div><div class="line">        <span class="keyword">guard</span> <span class="keyword">let</span> constraint = description.constraint <span class="keyword">else</span> &#123;</div><div class="line">            <span class="keyword">continue</span></div><div class="line">        &#125;</div><div class="line">        constraints.append(constraint)</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> constraints</div><div class="line">&#125;</div><div class="line"><span class="comment">// Note: 这里是静态方法</span></div><div class="line"><span class="keyword">internal</span> <span class="keyword">static</span> <span class="function"><span class="keyword">func</span> <span class="title">makeConstraints</span><span class="params">(item: LayoutConstraintItem, closure: <span class="params">(<span class="number">_</span> make: ConstraintMaker)</span></span></span> -&gt; <span class="type">Void</span>) &#123;</div><div class="line">    <span class="comment">// 调用 prepareConstraints 来配置约束</span></div><div class="line">    <span class="keyword">let</span> constraints = prepareConstraints(item: item, closure: closure)</div><div class="line">    <span class="comment">// 这里将所有约束全都加在 view 上</span></div><div class="line">    <span class="keyword">for</span> constraint <span class="keyword">in</span> constraints &#123;</div><div class="line">        constraint.activateIfNeeded(updatingExisting: <span class="literal">false</span>)</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>整个流程还是很明确的，但是核心的点就在 <code>closure(maker)</code> 这一句，是通过对 <code>maker</code> 的何种调用来实现这一切的。注意，这里的 <code>item</code> 是调用 <code>snp</code> 的那个对象。</p>
+<p>核心就在 <code>maker</code> 的实例方法上。往上翻，就可以发现 <code>maker</code> 的实例方法。举两个简单的如下：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">var</span> <span class="keyword">left</span>: <span class="type">ConstraintMakerExtendable</span> &#123;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">self</span>.makeExtendableWithAttributes(.<span class="keyword">left</span>)</div><div class="line">&#125;</div><div class="line">    </div><div class="line"><span class="keyword">public</span> <span class="keyword">var</span> top: <span class="type">ConstraintMakerExtendable</span> &#123;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">self</span>.makeExtendableWithAttributes(.top)</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">internal</span> <span class="function"><span class="keyword">func</span> <span class="title">makeExtendableWithAttributes</span><span class="params">(<span class="number">_</span> attributes: ConstraintAttributes)</span></span> -&gt; <span class="type">ConstraintMakerExtendable</span> &#123;</div><div class="line">    <span class="keyword">let</span> description = <span class="type">ConstraintDescription</span>(item: <span class="keyword">self</span>.item, attributes: attributes)</div><div class="line">    <span class="keyword">self</span>.descriptions.append(description)</div><div class="line">    <span class="keyword">return</span> <span class="type">ConstraintMakerExtendable</span>(description)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们发现这几个计算变量都调用了 <code>makeExtendableWithAttributes()</code> 生成了一个 <code>ConstraintDescription</code> 对象，并返回了一个 <code>ConstraintMakerExtendable</code> 对象。</p>
+<h3 id="constraintdescription"><a class="markdownIt-Anchor" href="#constraintdescription"></a> ConstraintDescription</h3>
+<p>这是一个类，全部内容如下：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConstraintDescription</span> </span>&#123;</div><div class="line">    <span class="comment">// 发起约束的对象</span></div><div class="line">    <span class="keyword">internal</span> <span class="keyword">let</span> item: <span class="type">LayoutConstraintItem</span> </div><div class="line">    <span class="comment">// 对对象的描述，如 left、right 等等</span></div><div class="line">    <span class="keyword">internal</span> <span class="keyword">var</span> attributes: <span class="type">ConstraintAttributes</span> </div><div class="line">    <span class="comment">// 约束的相关性，是对 Cocoa 的 LayoutRelation 进行的封装</span></div><div class="line">    <span class="keyword">internal</span> <span class="keyword">var</span> relation: <span class="type">ConstraintRelation</span>? = <span class="literal">nil</span></div><div class="line">    <span class="keyword">internal</span> <span class="keyword">var</span> sourceLocation: (<span class="type">String</span>, <span class="type">UInt</span>)? = <span class="literal">nil</span></div><div class="line">    <span class="keyword">internal</span> <span class="keyword">var</span> label: <span class="type">String</span>? = <span class="literal">nil</span></div><div class="line">    <span class="comment">// 约束的另一半</span></div><div class="line">    <span class="keyword">internal</span> <span class="keyword">var</span> related: <span class="type">ConstraintItem</span>? = <span class="literal">nil</span></div><div class="line">    <span class="comment">// AutoLayout 的三个基本配置</span></div><div class="line">    <span class="keyword">internal</span> <span class="keyword">var</span> multiplier: <span class="type">ConstraintMultiplierTarget</span> = <span class="number">1.0</span></div><div class="line">    <span class="keyword">internal</span> <span class="keyword">var</span> constant: <span class="type">ConstraintConstantTarget</span> = <span class="number">0.0</span></div><div class="line">    <span class="keyword">internal</span> <span class="keyword">var</span> priority: <span class="type">ConstraintPriorityTarget</span> = <span class="number">1000.0</span></div><div class="line">    <span class="comment">// 生成 SnapKit 中的约束对象，用于生成最终 AutoLayout 的约束对象</span></div><div class="line">    <span class="keyword">internal</span> <span class="built_in">lazy</span> <span class="keyword">var</span> constraint: <span class="type">Constraint</span>? = &#123;</div><div class="line">        <span class="keyword">guard</span> <span class="keyword">let</span> relation = <span class="keyword">self</span>.relation,</div><div class="line">              <span class="keyword">let</span> related = <span class="keyword">self</span>.related,</div><div class="line">              <span class="keyword">let</span> sourceLocation = <span class="keyword">self</span>.sourceLocation <span class="keyword">else</span> &#123;</div><div class="line">            <span class="keyword">return</span> <span class="literal">nil</span></div><div class="line">        &#125;</div><div class="line">        <span class="comment">// 这里生成约束的集合描述，即将 item 和 attribute 包装在一起</span></div><div class="line">        <span class="keyword">let</span> from = <span class="type">ConstraintItem</span>(target: <span class="keyword">self</span>.item, attributes: <span class="keyword">self</span>.attributes)</div><div class="line">        </div><div class="line">        <span class="keyword">return</span> <span class="type">Constraint</span>(</div><div class="line">            from: from,</div><div class="line">            to: related,</div><div class="line">            relation: relation,</div><div class="line">            sourceLocation: sourceLocation,</div><div class="line">            label: <span class="keyword">self</span>.label,</div><div class="line">            multiplier: <span class="keyword">self</span>.multiplier,</div><div class="line">            constant: <span class="keyword">self</span>.constant,</div><div class="line">            priority: <span class="keyword">self</span>.priority</div><div class="line">        )</div><div class="line">    &#125;()</div><div class="line">    </div><div class="line">    <span class="comment">// MARK: Initialization</span></div><div class="line">    </div><div class="line">    <span class="keyword">internal</span> <span class="keyword">init</span>(item: <span class="type">LayoutConstraintItem</span>, attributes: <span class="type">ConstraintAttributes</span>) &#123;</div><div class="line">        <span class="keyword">self</span>.item = item</div><div class="line">        <span class="keyword">self</span>.attributes = attributes</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们看到在 <code>ConstraintMakerExtendable</code> 中有如下的调用</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">self</span>.description.attributes += .<span class="keyword">left</span></div></pre></td></tr></table></figure>
+<p>这种写法就是 Swift 的 <code>OptionSet</code> 写法，类似于 OC 中的 <code>xxx|yyy</code> 写法，但是 Swift 中可以用 <code>[.xxx, .yyy]</code> 的写法，更优雅，可读性更高。</p>
+<h3 id="constraintmakerextendable"><a class="markdownIt-Anchor" href="#constraintmakerextendable"></a> ConstraintMakerExtendable</h3>
+<p><code>ConstraintMakerExtendable</code> 是一个类，继承与 <code>ConstraintMakerRelatable</code>, 一个可以表示相关性的类。</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConstraintMakerRelatable</span> </span>&#123;</div><div class="line">    </div><div class="line">    <span class="keyword">internal</span> <span class="keyword">let</span> description: <span class="type">ConstraintDescription</span></div><div class="line">    </div><div class="line">    <span class="keyword">internal</span> <span class="keyword">init</span>(<span class="number">_</span> description: <span class="type">ConstraintDescription</span>) &#123;</div><div class="line">        <span class="keyword">self</span>.description = description</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="keyword">internal</span> <span class="function"><span class="keyword">func</span> <span class="title">relatedTo</span><span class="params">(...)</span></span> -&gt; <span class="type">ConstraintMakerEditable</span> &#123;...&#125;</div><div class="line">    </div><div class="line">    <span class="comment">// 下面的方法都都调用了上面这个全能方法：relatedTo 表示了约束之间的关系</span></div><div class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">func</span> <span class="title">equalTo</span><span class="params">(<span class="number">_</span> other: ConstraintRelatableTarget, ...)</span></span> &#123;...&#125;</div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">equalToSuperview</span><span class="params">(...)</span></span> &#123;...&#125;</div><div class="line">    <span class="function"><span class="keyword">func</span> <span class="title">lessThanOrEqualTo</span><span class="params">(...)</span></span> &#123;...&#125;</div><div class="line">    <span class="comment">// ....</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>然后对其子类 <code>ConstraintMakerExtendable</code></p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConstraintMakerExtendable</span>: <span class="title">ConstraintMakerRelatable</span> </span>&#123;</div><div class="line">    </div><div class="line">    <span class="keyword">public</span> <span class="keyword">var</span> <span class="keyword">left</span>: <span class="type">ConstraintMakerExtendable</span> &#123;</div><div class="line">        <span class="keyword">self</span>.description.attributes += .<span class="keyword">left</span></div><div class="line">        <span class="keyword">return</span> <span class="keyword">self</span></div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="keyword">public</span> <span class="keyword">var</span> top: <span class="type">ConstraintMakerExtendable</span> &#123;</div><div class="line">        <span class="keyword">self</span>.description.attributes += .top</div><div class="line">        <span class="keyword">return</span> <span class="keyword">self</span></div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="comment">// ....</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>则是往 <code>description</code> 中添加东西，然后返回自己以提供链式调用。<br>
+所以我们就要关注一下 <code>description</code>，它做了什么可以储存遮这样的信息，以及他为什么叫 <code>description</code></p>
+<h4 id="trick"><a class="markdownIt-Anchor" href="#trick"></a> Trick</h4>
+<hr>
+<p>在 <code>equalTo</code> 的地方有一个很有意思的 Trick，它的类型是 <code>ConstraintRelatableTarget</code>，这样写的目的是我们的 api 也是支持 <code>make.width.height.equalTo(50)</code> 这样的写法。这里的 50 并不是一个 view 或者一个 <code>ConstraintItem</code> 所以需要一个类型将它们统一起来。所以就有了如下的代码：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">protocol</span> <span class="title">ConstraintRelatableTarget</span> </span>&#123;</div><div class="line">&#125;</div><div class="line"><span class="class"><span class="keyword">extension</span> <span class="title">Int</span>: <span class="title">ConstraintRelatableTarget</span> </span>&#123;</div><div class="line">&#125;</div><div class="line"><span class="comment">// 略去其他想 Float 等类型....</span></div><div class="line"><span class="class"><span class="keyword">extension</span> <span class="title">ConstraintItem</span>: <span class="title">ConstraintRelatableTarget</span> </span>&#123;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">extension</span> <span class="title">ConstraintView</span>: <span class="title">ConstraintRelatableTarget</span> </span>&#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这样一个 Trick 让很多不同个类型都统一了起来，成为一个抽象的 <code>ConstraintRelatableTarget</code> 进行使用，如此来支持多种类型。这样就避免为了支持多类型而是用 <code>Any</code> 这个类型不安全的类型，也做到了很好的类型约束，可以在编译期就能检查出类型的错误。</p>
+<p>因为在 iOS 9 中引入了一个新的 <code>UILayoutGuide</code>，它在参与 AutoLayout 布局时与 view 有着同样的作用，所以也出如下的代码</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">protocol</span> <span class="title">LayoutConstraintItem</span>: <span class="title">class</span> </span>&#123;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="meta">@available</span>(iOS <span class="number">9.0</span>, <span class="type">OSX</span> <span class="number">10.11</span>, *)</div><div class="line"><span class="class"><span class="keyword">extension</span> <span class="title">ConstraintLayoutGuide</span> : <span class="title">LayoutConstraintItem</span> </span>&#123;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">extension</span> <span class="title">ConstraintView</span> : <span class="title">LayoutConstraintItem</span> </span>&#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里也是将两者合并为了 <code>LayoutConstraintItem</code></p>
+<hr>
+<p>然后我们继续看到 <code>relatedTo()</code> 函数返回了一个 <code>ConstraintMakerEditable</code> 类型。</p>
+<h3 id="constraintmakereditable"><a class="markdownIt-Anchor" href="#constraintmakereditable"></a> ConstraintMakerEditable</h3>
+<p>类似 <code>ConstraintMakerExtendable</code>， 这个类配置了 <code>description</code> 的 <code>multiplier</code> <code>offset</code> <code>inset</code> <code>dividedBy</code> 属性。<br>
+与 <code>ConstraintMakerExtendable</code> 用了同样的技巧来规避内容的调用顺序，即继承，它继承了 <code>ConstraintMakerPriortizable</code>。</p>
+<h3 id="constraintmakerpriortizable"><a class="markdownIt-Anchor" href="#constraintmakerpriortizable"></a> ConstraintMakerPriortizable</h3>
+<p>这个类配置了 <code>description</code> 的优先级 <code>priority</code> ，然后在用继承，继承了 <code>ConstraintMakerFinalizable</code></p>
+<h3 id="constraintmakerfinalizable"><a class="markdownIt-Anchor" href="#constraintmakerfinalizable"></a> ConstraintMakerFinalizable</h3>
+<p>这个类配置了 <code>label</code> 值，一个用于对约束的描述，调试使用。</p>
+<p>这三个类使用继承，这三个类的属性可以以任意的顺序进行调用，然后 <code>ConstraintMakerEditable</code> 和 <code>ConstraintMakerExtendable</code> 分离，又很好的强调了描述约束的顺序要求。</p>
+<h3 id="简单的小结"><a class="markdownIt-Anchor" href="#简单的小结"></a> 简单的小结</h3>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">maker.top.<span class="keyword">left</span>.equalTo(button.snp.<span class="keyword">right</span>).labeled(<span class="string">"test"</span>).priority(.high)</div></pre></td></tr></table></figure>
+<p>(这个约束加的没有意义，只为举个栗子)<br>
+``第一个 <code>top</code> 生成了一个 <code>ConstraintMakerExtendable</code>，之后的 <code>left</code> 则是对 <code>ConstraintMakerExtendable</code> 的调用，向 <code>description</code> 中添加一个新的属性，之后的 <code>equalTo</code> 调用的是其父类的方法。而后返回的才可以配置约束的一些常数部分。语法和语义进行了很好的匹配。</p>
+<p>我们之前也探究了 <code>snp.right</code> 的写法，是直接生成了一个 <code>ConstraintItem</code>，这个是不支持链式调用的。</p>
+<p>是 <code>ConstraintMakerExtendable</code> 这个类提供了链式调用的写法来配置 <code>description</code>。</p>
+<p>我们每调用次以 <code>maker</code> 的实例方法都会创建一个 <code>description</code>，<code>maker</code> 会帮我们记录下来。</p>
+<h3 id="再次回到-constraintmaker"><a class="markdownIt-Anchor" href="#再次回到-constraintmaker"></a> 再次回到 ConstraintMaker</h3>
+<p>现在已经配置好了 <code>description</code>，接下来就在 <code>prepareConstraints()</code> 中提取出所有的 <code>constraint</code> 交还给 <code>makeConstraints()</code>，然后对所有的 <code>constraint</code> 调用 <code>constraint.activateIfNeeded(updatingExisting: false)</code>。</p>
+<h3 id="constraint"><a class="markdownIt-Anchor" href="#constraint"></a> Constraint</h3>
+<p>现在终于来到了 <code>Constraint</code> 类，这个类是 SnapKit 对约束的一个包装，他负责生成真正的 <code>NSLayoutConstraint</code> 的子类 <code>LayoutConstraint</code>，它提供的功能也不多，只是判断两个约束的相等性以及包装 <code>NSLayoutConstraint.identifier</code> 和持有一个生成它的 <code>Constraint</code> 的弱指针，方便查找。</p>
+<p>这个转换在 <code>init()</code> 中就已经完成。这个转换要注意，如果一个对象的 <code>attributes</code> 中如果有多个，比如有 <code>left</code> 以及 <code>right</code>，它就会生成两个 <code>LayoutConstraint</code> 对象并储存起来。所以如果要提取约束 <code>left</code> 用于之后控制的话，最好不要使用</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">self</span>.constraint = make.<span class="keyword">left</span>.<span class="keyword">right</span>.equalTo(container).constraint</div><div class="line">``` </div><div class="line">来获取约束，否则就要使用 </div><div class="line">```swift</div><div class="line"><span class="keyword">self</span>.constraint.layoutConstraints[<span class="number">0</span>]</div><div class="line">``` </div><div class="line">来获取对应约束。这样操作有顺序风险，并且 `<span class="keyword">self</span>.constraint.activate` 对其下对所有的约束都有应用，所以不推荐。建议分开写成：</div><div class="line">```swift</div><div class="line"><span class="keyword">self</span>.constraint = make.<span class="keyword">left</span>.equalTo(container).constraint</div><div class="line">make.<span class="keyword">right</span>.equalTo(container)</div></pre></td></tr></table></figure>
+<h3 id="常数处理"><a class="markdownIt-Anchor" href="#常数处理"></a> 常数处理</h3>
+<p>SnapKit 中使用了很多像上面的 Trick 部分的技巧，包装了很多数值类型，将其拓展不同的类型供不同部分使用，所有的封装如下：</p>
+<table>
+<thead>
+<tr>
+<th>Target</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ConstraintRelatableTarget</td>
+<td>relatedTo 使用</td>
+</tr>
+<tr>
+<td>ConstraintConstantTarget</td>
+<td>offset等使用</td>
+</tr>
+<tr>
+<td>ConstraintPriorityTarget</td>
+<td>priority使用，因为要使用 CGFloat</td>
+</tr>
+<tr>
+<td>ConstraintMultiplierTarget</td>
+<td>multiplier 使用，理由同上</td>
+</tr>
+<tr>
+<td>ConstraintOffsetTarget</td>
+<td>offset 使用</td>
+</tr>
+<tr>
+<td>ConstraintInsetTarget</td>
+<td>inset 使用</td>
+</tr>
+</tbody>
+</table>
+<h2 id="summary"><a class="markdownIt-Anchor" href="#summary"></a> Summary</h2>
+<p>总结下来，SnapKit 也是用了很多技巧使得这个库使用起来简单而优雅。</p>
+<p>首先是使用 <code>ConstraintViewDSL</code> 产生一个对象来跳脱 UIView。</p>
+<p>使用了 protocol 来整合基础类型，作为一种参数方便的使用。</p>
+<p>使用了继承来分模块来拓展支持属性，并且利用返回自己来实现链式调用。</p>
+<p>合理的控制对象类型的顺序来实现对象的控制语法和语义。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/源码阅读/" rel="tag"># 源码阅读</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/PromiseKit-源码初探（一）/" rel="next" title="PromiseKit 源码初探（一）">
+                <i class="fa fa-chevron-left"></i> PromiseKit 源码初探（一）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/ARM-汇编笔记/" rel="prev" title="ARM 汇编笔记">
+                ARM 汇编笔记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMTY4MS84MjQ1"></div>
+    </div>
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="BluesJiang" />
+            
+              <p class="site-author-name" itemprop="name">BluesJiang</p>
+              <p class="site-description motion-element" itemprop="description">A site to share MY learning journey</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/bluesjiang" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#snapkit"><span class="nav-number">1.</span> <span class="nav-text"> SnapKit</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#basic-usage"><span class="nav-number">2.</span> <span class="nav-text"> Basic Usage</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#get-started"><span class="nav-number">3.</span> <span class="nav-text"> Get Started</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#snp"><span class="nav-number">3.1.</span> <span class="nav-text"> snp</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#constraintviewdsl"><span class="nav-number">3.2.</span> <span class="nav-text"> ConstraintViewDSL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#constraintmaker"><span class="nav-number">3.3.</span> <span class="nav-text"> ConstraintMaker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#constraintdescription"><span class="nav-number">3.4.</span> <span class="nav-text"> ConstraintDescription</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#constraintmakerextendable"><span class="nav-number">3.5.</span> <span class="nav-text"> ConstraintMakerExtendable</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#trick"><span class="nav-number">3.5.1.</span> <span class="nav-text"> Trick</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#constraintmakereditable"><span class="nav-number">3.6.</span> <span class="nav-text"> ConstraintMakerEditable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#constraintmakerpriortizable"><span class="nav-number">3.7.</span> <span class="nav-text"> ConstraintMakerPriortizable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#constraintmakerfinalizable"><span class="nav-number">3.8.</span> <span class="nav-text"> ConstraintMakerFinalizable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简单的小结"><span class="nav-number">3.9.</span> <span class="nav-text"> 简单的小结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#再次回到-constraintmaker"><span class="nav-number">3.10.</span> <span class="nav-text"> 再次回到 ConstraintMaker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#constraint"><span class="nav-number">3.11.</span> <span class="nav-text"> Constraint</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#常数处理"><span class="nav-number">3.12.</span> <span class="nav-text"> 常数处理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#summary"><span class="nav-number">4.</span> <span class="nav-text"> Summary</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">BluesJiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.3</div>
+
+
+
+
+
+  <script src='https://unpkg.com/mermaid@<%= theme.mermaid.version %>/dist/mermaid.min.js'></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize({theme: 'forest'});
+    }
+  </script>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

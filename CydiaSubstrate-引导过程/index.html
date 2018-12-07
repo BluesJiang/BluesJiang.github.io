@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="BluesJiang">
 <meta property="og:description" content="这里是基于老版本开源的 CydiaSubstrate 源码进行分析，一定程度上可以印证现版本的 CydiaSubstrate 注入流程。 为了解答下面的问题：  CyidaSubstrate 是什么时候被加载的？ CydiaSubstrate 是怎么注入到每一个 APP 中的？   Cydia 结构 在越狱手机的 /Library/Frameworks/CydiaSubstrate.framewo">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-12-07T11:44:19.541Z">
+<meta property="og:updated_time" content="2018-12-07T11:59:05.004Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CydiaSubstrate 引导过程">
 <meta name="twitter:description" content="这里是基于老版本开源的 CydiaSubstrate 源码进行分析，一定程度上可以印证现版本的 CydiaSubstrate 注入流程。 为了解答下面的问题：  CyidaSubstrate 是什么时候被加载的？ CydiaSubstrate 是怎么注入到每一个 APP 中的？   Cydia 结构 在越狱手机的 /Library/Frameworks/CydiaSubstrate.framewo">
@@ -306,6 +306,28 @@
           </span>
 
           
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS逆向/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS逆向</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
 
           
             
@@ -445,8 +467,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/算法上机实验-单源-点对最短距离/" rel="next" title="算法上机实验----单源+点对最短距离">
-                <i class="fa fa-chevron-left"></i> 算法上机实验----单源+点对最短距离
+              <a href="/ARM-汇编笔记/" rel="next" title="ARM 汇编笔记">
+                <i class="fa fa-chevron-left"></i> ARM 汇编笔记
               </a>
             
           </div>
@@ -540,7 +562,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">14</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -551,7 +573,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -647,6 +669,14 @@
 
 
 
+
+
+  <script src='https://unpkg.com/mermaid@<%= theme.mermaid.version %>/dist/mermaid.min.js'></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize({theme: 'forest'});
+    }
+  </script>
 
         
 
