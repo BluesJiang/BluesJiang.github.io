@@ -87,22 +87,22 @@
 <meta property="og:site_name" content="BluesJiang">
 <meta property="og:description" content="CyidaSubstrate 的核心功能就是提供了一个强大的注入功能  Cydia Substrate - Powerful Code Insertion Platform –  Cydia Substrate 源代码注释   其中提供了两个核心的 Hook 函数  MSHookMessageEx – 用于 hook Objective-C 方法 MSHookFunction – 用于 hook">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15440657668716/15441006537689.jpg">
-<meta property="og:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15440657668716/15441020057624.jpg">
-<meta property="og:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15440657668716/15441547925906.jpg">
-<meta property="og:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15440657668716/15441532148701.jpg">
-<meta property="og:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15440657668716/15441020057624.jpg">
-<meta property="og:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15440657668716/15441547925906.jpg">
-<meta property="og:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15440657668716/15441661281597.jpg">
-<meta property="og:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15440657668716/15441669629199.jpg">
-<meta property="og:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15440657668716/15441679053396.jpg">
-<meta property="og:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15440657668716/15441760691225.jpg">
-<meta property="og:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15440657668716/15441763854689.jpg">
-<meta property="og:updated_time" content="2018-12-07T10:21:27.616Z">
+<meta property="og:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15441006537689.jpg">
+<meta property="og:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15441020057624.jpg">
+<meta property="og:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15441547925906.jpg">
+<meta property="og:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15441532148701.jpg">
+<meta property="og:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15441020057624.jpg">
+<meta property="og:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15441547925906.jpg">
+<meta property="og:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15441661281597.jpg">
+<meta property="og:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15441669629199.jpg">
+<meta property="og:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15441679053396.jpg">
+<meta property="og:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15441760691225.jpg">
+<meta property="og:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15441763854689.jpg">
+<meta property="og:updated_time" content="2018-12-07T11:45:59.572Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Cydia 的 Hook 原理">
 <meta name="twitter:description" content="CyidaSubstrate 的核心功能就是提供了一个强大的注入功能  Cydia Substrate - Powerful Code Insertion Platform –  Cydia Substrate 源代码注释   其中提供了两个核心的 Hook 函数  MSHookMessageEx – 用于 hook Objective-C 方法 MSHookFunction – 用于 hook">
-<meta name="twitter:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15440657668716/15441006537689.jpg">
+<meta name="twitter:image" content="https://bluesjiang.coding.me/Cydia-的-Hook-原理/15441006537689.jpg">
 
 
 
@@ -426,7 +426,7 @@
 <p>这里就需要查询一下 ARM 的指令手册了，因为观察了一下调用是传进来的参数，是一条 ARM 机器指令，说明这里就是一个机器指令的检查。</p>
 <p><strong>ARM 指令格式</strong></p>
 <p>ARM 指令都是定长的，所有指令都是 32 位，占 4 个字节的空间。下面的表展示了 ARM 指令各个为代表的内容：</p>
-<p><img src="/Cydia-的-Hook-原理/15440657668716/15441006537689.jpg" alt="-w967"></p>
+<img src="/Cydia-的-Hook-原理/15441006537689.jpg">
 <p>现在回顾函数的做的三个判断条件：</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">   (ic &amp; <span class="number">0x0c000000</span>) == <span class="number">0x04000000</span></div><div class="line">&amp;&amp; (ic &amp; <span class="number">0xf0000000</span>) != <span class="number">0xf0000000</span> </div><div class="line">&amp;&amp; (ic &amp; <span class="number">0x000f0000</span>) == <span class="number">0x000f0000</span></div></pre></td></tr></table></figure>
 <p>这些都是取出了某些位然后做出的检查判断。</p>
@@ -438,9 +438,9 @@
 <p>但是为什么要做这种检查还不能太早下定论，需要进一步的探索才能了解。（当然，根据实现思路应该可以猜到是为什么了）</p>
 <p>然后这个函数检查生效以后还有一个判断条件走不同的分支：</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">   (backup[offset] &amp; <span class="number">0x02000000</span>) == <span class="number">0</span>  </div><div class="line">|| (backup[offset] &amp; <span class="number">0x0000f000</span> &gt;&gt; <span class="number">12</span>) != (backup[offset] &amp; <span class="number">0x0000000f</span>)</div></pre></td></tr></table></figure>
-<p>用和上面相同的办法进行查找，不过，因为第一个判断已经确定一个读写指令，所以可以对照读写指令的详细格式：<br>
-<img src="/Cydia-的-Hook-原理/15440657668716/15441020057624.jpg" alt="-w860"><br>
-<img src="/Cydia-的-Hook-原理/15440657668716/15441547925906.jpg" alt="-w1390"></p>
+<p>用和上面相同的办法进行查找，不过，因为第一个判断已经确定一个读写指令，所以可以对照读写指令的详细格式：</p>
+<img src="/Cydia-的-Hook-原理/15441020057624.jpg">
+<img src="/Cydia-的-Hook-原理/15441547925906.jpg">
 <ul>
 <li>I 指示指令的寻址方式，0 为立即数寻址，1 为寄存器寻址</li>
 </ul>
@@ -454,7 +454,7 @@
 接下来开始填充代码，源代码如下：（不要紧张，可以先简单阅读，找出一些关键点）</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">size_t</span> start(<span class="number">0</span>), end(length / <span class="keyword">sizeof</span>(<span class="keyword">uint32_t</span>)); <span class="comment">// 单位是指令数</span></div><div class="line"><span class="keyword">uint32_t</span> *trailer(<span class="keyword">reinterpret_cast</span>&lt;<span class="keyword">uint32_t</span> *&gt;(buffer + end)); <span class="comment">// 这里指向了最后一条指令 + 1</span></div><div class="line"><span class="keyword">for</span> (<span class="keyword">unsigned</span> offset(<span class="number">0</span>); offset != used / <span class="keyword">sizeof</span>(<span class="keyword">uint32_t</span>); ++offset) </div><div class="line">        <span class="comment">// 这里的检查与上面计算指令数的条件是一样的</span></div><div class="line">    <span class="keyword">if</span> (A$pcrel$r(backup[offset])) &#123; </div><div class="line">        <span class="keyword">union</span> &#123;</div><div class="line">            <span class="keyword">uint32_t</span> value;</div><div class="line">            <span class="comment">// 这里讲指令进行了分解，可以看到分解的情况跟之前的图是对应的</span></div><div class="line">            <span class="class"><span class="keyword">struct</span> &#123;</span></div><div class="line">                <span class="keyword">uint32_t</span> rm : <span class="number">4</span>;</div><div class="line">                <span class="keyword">uint32_t</span> : <span class="number">1</span>;</div><div class="line">                <span class="keyword">uint32_t</span> shift : <span class="number">2</span>;</div><div class="line">                <span class="keyword">uint32_t</span> shiftamount : <span class="number">5</span>;</div><div class="line">                <span class="keyword">uint32_t</span> rd : <span class="number">4</span>;</div><div class="line">                <span class="keyword">uint32_t</span> rn : <span class="number">4</span>;</div><div class="line">                <span class="keyword">uint32_t</span> l : <span class="number">1</span>;</div><div class="line">                <span class="keyword">uint32_t</span> w : <span class="number">1</span>;</div><div class="line">                <span class="keyword">uint32_t</span> b : <span class="number">1</span>;</div><div class="line">                <span class="keyword">uint32_t</span> u : <span class="number">1</span>;</div><div class="line">                <span class="keyword">uint32_t</span> p : <span class="number">1</span>;</div><div class="line">                <span class="keyword">uint32_t</span> mode : <span class="number">1</span>;</div><div class="line">                <span class="keyword">uint32_t</span> type : <span class="number">2</span>;</div><div class="line">                <span class="keyword">uint32_t</span> cond : <span class="number">4</span>;</div><div class="line">            &#125;;</div><div class="line">        &#125; bits = &#123;backup[offset+<span class="number">0</span>]&#125;, copy(bits); <span class="comment">// 这里对原来的指令做了一次拷贝</span></div><div class="line"></div><div class="line">        <span class="keyword">bool</span> guard;</div><div class="line">          <span class="comment">// 这个地方印证了在计算指令条数时，分析判断条件的正确性</span></div><div class="line">        <span class="comment">// 这里对原来的指令做出调整</span></div><div class="line">        <span class="keyword">if</span> (bits.mode == <span class="number">0</span> || bits.rd != bits.rm) &#123;</div><div class="line">            copy.rn = bits.rd;</div><div class="line">            guard = <span class="literal">false</span>;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            copy.rn = bits.rm != A$r0 ? A$r0 : A$r1;</div><div class="line">            guard = <span class="literal">true</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="comment">// 将 copy.rn 内容压栈</span></div><div class="line">        <span class="keyword">if</span> (guard)</div><div class="line">            buffer[start++] = A$stmdb_sp$_$rs$((<span class="number">1</span> &lt;&lt; copy.rn));</div><div class="line">        <span class="comment">// 核心的调整代码</span></div><div class="line">        buffer[start+<span class="number">0</span>] = A$ldr_rd_$rn_im$(copy.rn, A$pc, (end<span class="number">-1</span> - (start+<span class="number">0</span>)) * <span class="number">4</span> - <span class="number">8</span>);</div><div class="line">        buffer[start+<span class="number">1</span>] = copy.value;</div><div class="line"></div><div class="line">        start += <span class="number">2</span>;</div><div class="line">        <span class="comment">// 将 copy.rn 从栈中读出来</span></div><div class="line">        <span class="keyword">if</span> (guard)</div><div class="line">            buffer[start++] = A$ldmia_sp$_$rs$((<span class="number">1</span> &lt;&lt; copy.rn));</div><div class="line">        <span class="comment">// 将原指令地址放在尾部</span></div><div class="line">        *--trailer = <span class="keyword">reinterpret_cast</span>&lt;<span class="keyword">uint32_t</span>&gt;(area + offset) + <span class="number">8</span>;</div><div class="line">        end -= <span class="number">1</span>;</div><div class="line">    &#125; <span class="keyword">else</span></div><div class="line">        buffer[start++] = backup[offset]; <span class="comment">// 拷贝源指令</span></div><div class="line"><span class="comment">// 尾部的跳转指令</span></div><div class="line">buffer[start+<span class="number">0</span>] = A$ldr_rd_$rn_im$(A$pc, A$pc, <span class="number">4</span> - <span class="number">8</span>);</div><div class="line">buffer[start+<span class="number">1</span>] = <span class="keyword">reinterpret_cast</span>&lt;<span class="keyword">uint32_t</span>&gt;(area + used / <span class="keyword">sizeof</span>(<span class="keyword">uint32_t</span>));</div><div class="line"><span class="comment">// 给 buffer 执行的权限</span></div><div class="line"><span class="keyword">if</span> (mprotect(buffer, length, PROT_READ | PROT_EXEC) == <span class="number">-1</span>) &#123;</div><div class="line">    MSLog(MSLogLevelError, <span class="string">"MS:Error:mprotect():%d"</span>, errno);</div><div class="line">    <span class="keyword">goto</span> fail;</div><div class="line">&#125;</div><div class="line"><span class="comment">// 将修改好的源函数返回</span></div><div class="line">*result = buffer;</div><div class="line"><span class="comment">// 最后修改目标函数的代码</span></div><div class="line">&#123;</div><div class="line">    <span class="function">SubstrateHookMemory <span class="title">code</span><span class="params">(process, symbol, used)</span></span>;</div><div class="line"></div><div class="line">    arm[<span class="number">0</span>] = A$ldr_rd_$rn_im$(A$pc, A$pc, <span class="number">4</span> - <span class="number">8</span>);</div><div class="line">    arm[<span class="number">1</span>] = <span class="keyword">reinterpret_cast</span>&lt;<span class="keyword">uint32_t</span>&gt;(replace);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>先忽略代码中指令调整的处理，从代码逻辑可以看出来，在最简单的情况下，这个程序对原程序作了如下图的调整：</p>
-<p><img src="/Cydia-的-Hook-原理/15440657668716/15441532148701.jpg" alt="-w1149"></p>
+<img src="/Cydia-的-Hook-原理/15441532148701.jpg">
 <p>通过修改 pc 的值，就可以实现直接的跳转，如此实现的调用原函数会跳转到替代函数中，而想要调用原函数时，只需要对 buffer 进行调用，让它来帮助跳转即可，所以计算长度时最后多家的两个指令就是为了处理跳转使用。</p>
 <p>至此，按理说 Cyida 对 C 语言的 hook 原理已经很清楚了，但是为什么还多出了这么多处理呢？</p>
 <h3 id="维护-pc-相对值"><a class="markdownIt-Anchor" href="#维护-pc-相对值"></a> 维护 pc 相对值</h3>
@@ -467,8 +467,8 @@
 <p>这个文件定义了 ARM 的所有寄存器 <code>r0~r15</code>，不过关键是在还定义了许多宏，这些宏都代表了一条 ARM 指令。</p>
 <p>这里拿出一个宏进行分析，其他的宏构造指令的方式都是一样的：</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">define</span> A$ldr_rd_$rn_im$(rd, rn, im) <span class="comment">/* ldr rd, [rn, #im] */</span> \</span></div><div class="line">    (<span class="number">0xe5100000</span> | ((im) &lt; <span class="number">0</span> ? <span class="number">0</span> : <span class="number">1</span> &lt;&lt; <span class="number">23</span>) | ((rn) &lt;&lt; <span class="number">16</span>) | ((rd) &lt;&lt; <span class="number">12</span>) | <span class="built_in">abs</span>(im))</div></pre></td></tr></table></figure>
-<p><img src="/Cydia-的-Hook-原理/15440657668716/15441020057624.jpg" alt="-w860"><br>
-<img src="/Cydia-的-Hook-原理/15440657668716/15441547925906.jpg" alt="-w1390"></p>
+<img src="/Cydia-的-Hook-原理/15441020057624.jpg">
+<img src="/Cydia-的-Hook-原理/15441547925906.jpg">
 <p>对照就可分析了：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">0xe5100000 -&gt; 1110 010 1 0 0 0 1 0000 0000 000000000000</div></pre></td></tr></table></figure>
 <p>判断 im 是否为负，为负则将 U 置为 0 表示要减掉，1 表示为加上。然后将 <code>rn</code> <code>rd</code> 移动到对应的位置，最后的部分放置立即数。</p>
@@ -482,7 +482,7 @@
 <p>经过上述的修改流程，可以知道 buffer 中的代码变成了如下形式：</p>
 <figure class="highlight arm"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">ldr </span><span class="built_in">r8</span>, [<span class="built_in">pc</span>, <span class="symbol">#X</span>] <span class="comment">; 这里 [pc, #X] 指向了buffer末尾，存储原指令的地址</span></div><div class="line"><span class="keyword">ldr </span><span class="built_in">r8</span>, [<span class="built_in">r8</span>, <span class="number">#10</span>]</div></pre></td></tr></table></figure>
 <p>假设只有第一行是需要特殊处理的，并且第一条形式跟现在讨论的相同，由上述推知 buffer 应该有 6 个指令长，操作过后buffer指令的形式如下：</p>
-<p><img src="/Cydia-的-Hook-原理/15440657668716/15441661281597.jpg" alt="-w466"></p>
+<img src="/Cydia-的-Hook-原理/15441661281597.jpg">
 <p>这里需要说明一下为什么会有一个 -8 的操作。查询 ARM 的手册，有如下几句话：</p>
 <blockquote>
 <p>For an ARM instruction, the value read is the address of the instruction plus 8 bytes. Bits [1:0] of this value are always zero, because ARM instructions are always word-aligned</p>
@@ -498,7 +498,7 @@
 <p>依旧举一个例子：</p>
 <figure class="highlight arm"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">ldr </span><span class="built_in">r8</span>, [<span class="built_in">pc</span>, <span class="built_in">r8</span>]</div></pre></td></tr></table></figure>
 <p>前提依旧跟第一种情况一样，不过现在 buffer 的长度为 8 条指令。</p>
-<p><img src="/Cydia-的-Hook-原理/15440657668716/15441669629199.jpg" alt="-w539"></p>
+<img src="/Cydia-的-Hook-原理/15441669629199.jpg">
 <p>原理也很简单，因为这里需要一个中间变量 r0，但是又不能破坏原来 r0 中的值，所以使用栈暂时将 r0 的值进行保存。</p>
 <h3 id="只能-hook-一次"><a class="markdownIt-Anchor" href="#只能-hook-一次"></a> 只能 hook 一次</h3>
 <p>源代码在开始不久就有一个这样的检查，是不是很眼熟？这就是 hook 后修改的内存指令。这里检查函数是否被 hook 过了，如果被 hook 过了，就将 hook 的原 replace 函数作为结果返回，方便我们队之前的 hook 函数进行 hook。</p>
@@ -506,7 +506,7 @@
 <h3 id="总结-2"><a class="markdownIt-Anchor" href="#总结-2"></a> 总结</h3>
 <p>自此，<code>SubstrateHookFunctionARM</code> 函数就分析完毕了，其实还有一个 <code>SubstrateHookFunctionThumb</code> 函数，负责用来 hook Thmub 指令模式下的函数。</p>
 <p>经过了这一系列的操作，调用顺序这变成了下面的形式：</p>
-<p><img src="/Cydia-的-Hook-原理/15440657668716/15441679053396.jpg" alt="-w582"></p>
+<img src="/Cydia-的-Hook-原理/15441679053396.jpg">
 <p>看上去似乎循环了，但是 Result 的跳转是到原函数的第3条指令，所以不会发生死循环。</p>
 <h2 id="mshookmessage"><a class="markdownIt-Anchor" href="#mshookmessage"></a> MSHookMessage</h2>
 <p>在 arm 中，Cyida 提供了三个接口对 Objective-C 的方法进行 hook：</p>
@@ -550,10 +550,10 @@
 <p>所有 hook 后的替换函数都调用了原函数以保证功能正确。</p>
 <p>假设 C 先 hook，B 后 hook。</p>
 <p>如果没有如此上面的处理，直接将父类的实现地址放到内存中，则会产生如下的调用链：</p>
-<p><img src="/Cydia-的-Hook-原理/15440657668716/15441760691225.jpg" alt="-w766"></p>
+<img src="/Cydia-的-Hook-原理/15441760691225.jpg">
 <p>因为 B 的 <code>method</code> 后与 C 添加，所以在调用 <code>[c method]</code> 时不会运行 B 的自定义函数。</p>
 <p>如果做了上述的处理，就可以动态的查询父类的实现，就能生成如下如下的调用链：</p>
-<p><img src="/Cydia-的-Hook-原理/15440657668716/15441763854689.jpg" alt="-w726"></p>
+<img src="/Cydia-的-Hook-原理/15441763854689.jpg">
 <p>这样在调用 <code>[c method]</code> 时，B 的函数也能正确的被调用。使得调用的顺序与 hook 的顺序无关。</p>
 <h3 id="总结-3"><a class="markdownIt-Anchor" href="#总结-3"></a> 总结</h3>
 <p>OC 的 runtime 机制让 OC 方法的 hook 实现简单了很多，利用方法实现的替换就可以做到对方法的 hook。这里的精髓则是在 hook 时，对调用链进行的处理。</p>
