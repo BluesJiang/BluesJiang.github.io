@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="源码阅读," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="这里是基于老版本开源的 CydiaSubstrate 源码进行分析，一定程度上可以印证现版本的 CydiaSubstrate 注入流程。 为了解答下面的问题：  CyidaSubstrate 是什么时候被加载的？ CydiaSubstrate 是怎么注入到每一个 APP 中的？   Cydia 结构 在越狱手机的 /Library/Frameworks/CydiaSubstrate.framewo">
+<meta name="keywords" content="源码阅读">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CydiaSubstrate 引导过程">
+<meta property="og:url" content="https://bluesjiang.coding.me/CydiaSubstrate-引导过程/index.html">
+<meta property="og:site_name" content="BluesJiang">
+<meta property="og:description" content="这里是基于老版本开源的 CydiaSubstrate 源码进行分析，一定程度上可以印证现版本的 CydiaSubstrate 注入流程。 为了解答下面的问题：  CyidaSubstrate 是什么时候被加载的？ CydiaSubstrate 是怎么注入到每一个 APP 中的？   Cydia 结构 在越狱手机的 /Library/Frameworks/CydiaSubstrate.framewo">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-12-07T10:21:38.540Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CydiaSubstrate 引导过程">
+<meta name="twitter:description" content="这里是基于老版本开源的 CydiaSubstrate 源码进行分析，一定程度上可以印证现版本的 CydiaSubstrate 注入流程。 为了解答下面的问题：  CyidaSubstrate 是什么时候被加载的？ CydiaSubstrate 是怎么注入到每一个 APP 中的？   Cydia 结构 在越狱手机的 /Library/Frameworks/CydiaSubstrate.framewo">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://bluesjiang.coding.me/CydiaSubstrate-引导过程/"/>
+
+
+
+
+
+<meta name="baidu-site-verification" content="84JyTny968" />
+
+
+  <title>CydiaSubstrate 引导过程 | BluesJiang</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?0a6938376c62cf496032c7169aa31e64";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">BluesJiang</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://bluesjiang.coding.me/CydiaSubstrate-引导过程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="BluesJiang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="BluesJiang">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">CydiaSubstrate 引导过程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-07T18:12:09+08:00">
+                2018-12-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>这里是基于老版本开源的 CydiaSubstrate 源码进行分析，一定程度上可以印证现版本的 CydiaSubstrate 注入流程。<br>
+为了解答下面的问题：</p>
+<blockquote>
+<p><code>CyidaSubstrate</code> 是什么时候被加载的？<br>
+<code>CydiaSubstrate</code> 是怎么注入到每一个 APP 中的？</p>
+</blockquote>
+<h2 id="cydia-结构"><a class="markdownIt-Anchor" href="#cydia-结构"></a> Cydia 结构</h2>
+<p>在越狱手机的 <code>/Library/Frameworks/CydiaSubstrate.framework</code>，可以看到CyidaSubstrate 主要分为以下几个部分：</p>
+<ul>
+<li><code>CydiaSubstrate(libsubstrate.dylib)</code> 提供核心 <code>MSHookFunction</code>， <code>MSHookMessageEx</code> 等 hook 功能</li>
+<li><code>SubstrateBootstrap.dylib</code> 提供 CydiaSubstrate 的引导</li>
+<li><code>SubstrateLauncher.dylib</code> 用于启动引导</li>
+<li><code>SubstrateLoader.dylib</code> 负责加载 <code>/Library/MobileSubsrate/</code> 目录下的对应动态库</li>
+</ul>
+<a id="more"></a>
+<h2 id="查找启动相关的代码"><a class="markdownIt-Anchor" href="#查找启动相关的代码"></a> 查找启动相关的代码</h2>
+<p>为了了解每一个对应的二进制是如何产生的，就需要去检查它是如何被编译出来的。<br>
+查看它的编译文件 <code>darwin.mk</code></p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="section">libsubstrate.dylib: DarwinFindSymbol.o DarwinInjector.o ObjectiveC.o <span class="variable">$(lsubstrate)</span></span></div><div class="line">	<span class="variable">$(cycc)</span> -dynamiclib <span class="variable">$(hde64c)</span> -lobjc -install_name <span class="variable">$(framework)</span>/CydiaSubstrate</div><div class="line"></div><div class="line"><span class="section">SubstrateBootstrap.dylib: Bootstrap.o</span></div><div class="line">	<span class="variable">$(cycc)</span> -dynamiclib</div><div class="line"></div><div class="line"><span class="section">SubstrateLauncher.dylib: DarwinLauncher.o <span class="variable">$(lsubstrate)</span></span></div><div class="line">	<span class="variable">$(cycc)</span> -dynamiclib <span class="variable">$(hde64c)</span></div><div class="line"></div><div class="line"><span class="section">SubstrateLoader.dylib: DarwinLoader.o Environment.o</span></div><div class="line">	<span class="variable">$(cycc)</span> -dynamiclib -framework CoreFoundation</div></pre></td></tr></table></figure>
+<p>可以检索到对应的文件，我们的关键带你就落在下面这些文件上</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">Bootstrap.cpp</div><div class="line">DarwinLauncher.cpp</div><div class="line">DarwinLoader.cpp</div></pre></td></tr></table></figure>
+<h3 id="boostrapcpp"><a class="markdownIt-Anchor" href="#boostrapcpp"></a> Boostrap.cpp</h3>
+<p>文件的源代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"CydiaSubstrate.h"</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></div><div class="line">MSInitialize &#123;      <span class="comment">//__attribute__((__constructor__)) static void _MSInitialize(void)</span></div><div class="line">    <span class="keyword">if</span> (getenv(<span class="string">"MSExitZero"</span>) != <span class="literal">NULL</span>) &#123;</div><div class="line">        <span class="comment">// skeels / planetbeing / rpetrich &lt;- reporting SMS crash</span></div><div class="line">        <span class="keyword">if</span> (dlopen(<span class="string">"/System/Library/PrivateFrameworks/Search.framework/AppIndexer"</span>, RTLD_LAZY | RTLD_NOLOAD) != <span class="literal">NULL</span>)</div><div class="line">            _exit(EXIT_FAILURE);</div><div class="line"></div><div class="line">        _exit(EXIT_SUCCESS);</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// Skype</span></div><div class="line">    <span class="keyword">if</span> (dlopen(<span class="string">"/System/Library/Frameworks/Security.framework/Security"</span>, RTLD_LAZY | RTLD_NOLOAD) == <span class="literal">NULL</span>)</div><div class="line">        <span class="keyword">return</span>;</div><div class="line">    <span class="comment">// Maps</span></div><div class="line">    dlopen(<span class="string">"/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation"</span>, RTLD_LAZY | RTLD_GLOBAL);</div><div class="line">    dlopen(<span class="string">"/Library/Frameworks/CydiaSubstrate.framework/Libraries/SubstrateLoader.dylib"</span>, RTLD_LAZY | RTLD_GLOBAL);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>做的工作很简单，即动态加载一些必要的动态库，并且核心是为了引导 <code>SubstrateLoader.dylib</code> 的加载。</p>
+<h3 id="darwinloadercpp"><a class="markdownIt-Anchor" href="#darwinloadercpp"></a> DarwinLoader.cpp</h3>
+<p>这个动态库被加载时，会做安全模式的检查，如果不是安全模式，则遍历</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/Library/MobileSubsrate/DynamicLibraries/</div></pre></td></tr></table></figure>
+<p>目录下的所有 <code>*.plist</code> 文件，根据文件描述的信息来选择加载动态库。这就是为什么我们编写 Cydia 插件时，我们的代码可以正确的被加载并且完成注入。</p>
+<p>在安全模式下会跳过加载的流程，为了处理因为一些插件崩溃而导致所有插件不可用的情况，为了可以在安全模式下删除或者调整崩溃的插件。</p>
+<p>不过这对我们研究启动过程关系不大。</p>
+<h3 id="darwinlaunchercpp"><a class="markdownIt-Anchor" href="#darwinlaunchercpp"></a> DarwinLauncher.cpp</h3>
+<p>下面取自初始化部分的源码，功能是 hook <code>posix_spawn</code> 函数：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">MSInitialize &#123;</div><div class="line">    <span class="comment">// 获取 posix_spawn 的符号信息，拿到对应的实现</span></div><div class="line">    Dl_info info;</div><div class="line">    <span class="keyword">if</span> (dladdr(<span class="keyword">reinterpret_cast</span>&lt;<span class="keyword">void</span> *&gt;(&amp;$posix_spawn), &amp;info) == <span class="number">0</span>)</div><div class="line">        <span class="keyword">return</span>;</div><div class="line">    void *handle(dlopen(info.dli_fname, RTLD_NOLOAD));</div><div class="line"></div><div class="line">    <span class="comment">// before we unload the previous version, we hook posix_spawn to call our replacements</span></div><div class="line">    <span class="comment">// the original posix_spawn (from Apple) is kept in _MSPosixSpawn for use by new versions</span></div><div class="line"></div><div class="line">    <span class="comment">// 核心部分：替换系统的 posix_spawn 的实现，为了在调用前做一些工作</span></div><div class="line">    <span class="keyword">if</span> (<span class="keyword">const</span> <span class="keyword">char</span> *cache = getenv(<span class="string">"_MSPosixSpawn"</span>)) &#123;</div><div class="line">        MSReinterpretAssign(_posix_spawn, strtoull(cache, <span class="literal">NULL</span>, <span class="number">0</span>));</div><div class="line">        MSHookFunction(&amp;posix_spawn, &amp;$posix_spawn);</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        MSHookFunction(&amp;posix_spawn, MSHake(posix_spawn));</div><div class="line"></div><div class="line">        <span class="keyword">char</span> cache[<span class="number">32</span>];</div><div class="line">        <span class="built_in">sprintf</span>(cache, <span class="string">"%p"</span>, _posix_spawn);</div><div class="line">        setenv(<span class="string">"_MSPosixSpawn"</span>, cache, <span class="literal">false</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">   <span class="comment">// ... 其他清理代码</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在更替的实现中，核心工作就是在读取环境变量 <code>DYLD_INSERT_LIBRARIES</code> ，向其中添加 <code>/Library/MobileSubstrate/MobileSubstrate.dylib</code>，并且把这个参数放在了变量的第一位，保证其能第一个加载。</p>
+<p>为什么是 <code>MobileSubstrate.dylib</code>？</p>
+<p>在真机的调试中进行查找：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">iPhone:/ root# ls -al /Library/MobileSubstrate/MobileSubstrate.dylib</div><div class="line">lrwxr-xr-x 1 root staff 79 Mar 16  2017 /Library/MobileSubstrate/MobileSubstrate.dylib -&gt; /Library/Frameworks/CydiaSubstrate.framework/Libraries/SubstrateInjection.dylib</div><div class="line">iPhone:/ root# ls -al /Library/Frameworks/CydiaSubstrate.framework/Libraries/</div><div class="line">total 348</div><div class="line">drwxr-xr-x 2 root staff    204 Mar 16  2017 .</div><div class="line">drwxr-xr-x 5 root staff    238 Mar 16  2017 ..</div><div class="line">-rwxr-xr-x 1 root staff  99056 Sep 13  2016 SubstrateBootstrap.dylib</div><div class="line">lrwxr-xr-x 1 root staff     24 Mar 16  2017 SubstrateInjection.dylib -&gt; SubstrateBootstrap.dylib</div><div class="line">-rwxr-xr-x 1 root staff 139296 Sep 13  2016 SubstrateLauncher.dylib</div><div class="line">-rwxr-xr-x 1 root staff 103536 Sep 13  2016 SubstrateLoader.dylib</div></pre></td></tr></table></figure>
+<p>从输出可以看到，<code>MobileSubstrate.dylib</code> 链接到了 <code>SubstrateInjection.dylib</code>，然后后者有链接到了 <code>SubstrateBoostrap.dylib</code>！</p>
+<p>所以 hook 这个函数是为了 利用 <code>DYLD_INSERT_LIBRARIES</code> 将 <code>SubstrateBoostrap.dylib</code> 注入到程序中然后引导其他的动态库。</p>
+<p>至此似乎就结束了，但是还有一些问题没有解决：</p>
+<blockquote>
+<p>是谁加载的 <code>SubstrateLauncher.dylib</code> ？<br>
+为什么要 hook <code>posix_spwan</code> ?</p>
+</blockquote>
+<h2 id="寻找-substratelauncher-的启动源头"><a class="markdownIt-Anchor" href="#寻找-substratelauncher-的启动源头"></a> 寻找 SubstrateLauncher 的启动源头</h2>
+<p>继续查看 <code>darwin.mk</code> 来寻找线索，下面的一个编译目标比较引人注意：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">extrainst_ postrm: LaunchDaemons.o Cydia.o</div><div class="line"></div><div class="line"><span class="section">deb: ios extrainst_ postrm</span></div><div class="line">	./package.sh i386</div><div class="line">	./package.sh arm</div></pre></td></tr></table></figure>
+<blockquote>
+<p>control.tar.gz 则包含了一个 deb 安装的时候所需要的控制信息。一般有 5 个文件：control，用了记录软件标识，版本号，平台，依赖信息等数据；preinst，在解包data.tar.gz 前运行的脚本；postinst，在解包数据后运行的脚本；prerm，卸载时，在删除文件之前运行的脚本；postrm，在删除文件之后运行的脚本；在 Cydia 系统中，Cydia 的作者 Saurik 另外添加了一个脚本，extrainst_，作用与 postinst 类似。<br>
+– <cite>摘自百度百科</cite></p>
+</blockquote>
+<p>由此可知，这两个是在 Cydia 被安装时做了一些工作。</p>
+<h3 id="extrainst_mm"><a class="markdownIt-Anchor" href="#extrainst_mm"></a> extrainst_.mm</h3>
+<p>针对 arm 编译条件的跳转，观察到函数执行了这个部分：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> <span class="keyword">int</span> InstallSemiTether() &#123;</div><div class="line">    MSClearLaunchDaemons();</div><div class="line"></div><div class="line">    <span class="built_in">NSFileManager</span> *manager([<span class="built_in">NSFileManager</span> defaultManager]);</div><div class="line">    <span class="built_in">NSError</span> *error;</div><div class="line"></div><div class="line">    <span class="comment">// 下面的内容是因为一些BUG，需要对库进行一下拷贝以期望能正确运行</span></div><div class="line">    <span class="comment">// 核心是获取 SubstrateLauncher_</span></div><div class="line">    <span class="comment">// 即 "/Library/Frameworks/CydiaSubstrate.framework/Libraries/SubstrateLauncher.dylib"</span></div><div class="line"></div><div class="line">    <span class="built_in">NSString</span> *temp([<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"/tmp/ms-%f.dylib"</span>, [[<span class="built_in">NSDate</span> date] timeIntervalSinceReferenceDate]]);</div><div class="line"></div><div class="line">    <span class="built_in">NSString</span> *dylib;</div><div class="line">    <span class="keyword">if</span> ([manager copyItemAtPath:@ SubstrateLauncher_ toPath:temp error:&amp;error])</div><div class="line">        dylib = temp;</div><div class="line">    <span class="keyword">else</span> &#123;</div><div class="line">        fprintf(stderr, <span class="string">"unable to copy: %s\n"</span>, [[error description] UTF8String]);</div><div class="line">        <span class="comment">// <span class="doctag">XXX:</span> this is not actually reasonable</span></div><div class="line">        dylib = @ SubstrateLauncher_;</div><div class="line">        temp = <span class="literal">nil</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// 用 system 函数执行命令，这个命令用到了 cynject 这是个疑点</span></div><div class="line">    system([[<span class="string">@"/usr/bin/cynject 1 "</span> stringByAppendingString:dylib] UTF8String]);</div><div class="line"></div><div class="line">    <span class="comment">// if we are unable to remove the file copied into /tmp, it is interesting, but harmless</span></div><div class="line"></div><div class="line">    <span class="keyword">if</span> (temp != <span class="literal">nil</span> &amp;&amp; ![manager removeItemAtPath:temp error:&amp;error])</div><div class="line">        <span class="keyword">if</span> (unlink([temp UTF8String]) == <span class="number">-1</span>)</div><div class="line">            fprintf(stderr, <span class="string">"unable to remove: (%s):%d\n"</span>, [[error description] UTF8String], errno);</div><div class="line"></div><div class="line">    <span class="comment">// 核心，这里读取了 "/etc/launchd.conf" 的配置信息</span></div><div class="line">    <span class="built_in">NSString</span> *config([<span class="built_in">NSString</span> stringWithContentsOfFile:@ SubstrateLaunchConfig_ encoding:<span class="built_in">NSNonLossyASCIIStringEncoding</span> error:&amp;error]);</div><div class="line">    <span class="comment">// <span class="doctag">XXX:</span> if the file fails to load, it might not be missing: it might be unreadable for some reason</span></div><div class="line">    <span class="keyword">if</span> (config == <span class="literal">nil</span>)</div><div class="line">        config = <span class="string">@""</span>;</div><div class="line"></div><div class="line">    <span class="built_in">NSArray</span> *lines([config componentsSeparatedByString:<span class="string">@"\n"</span>]);</div><div class="line">    <span class="built_in">NSMutableArray</span> *<span class="keyword">copy</span>([lines mutableCopy]);</div><div class="line"></div><div class="line">    [<span class="keyword">copy</span> removeObject:<span class="string">@""</span>];</div><div class="line">    <span class="comment">// 向其中添加 SubstrateBootstrapExecute_</span></div><div class="line">    <span class="comment">// 即 bsexec .. /usr/bin/cynject 1  SubstrateLauncher_</span></div><div class="line">    <span class="keyword">if</span> ([lines indexOfObject:@ SubstrateBootstrapExecute_] == <span class="built_in">NSNotFound</span>)</div><div class="line">        [<span class="keyword">copy</span> addObject:@ SubstrateBootstrapExecute_];</div><div class="line"></div><div class="line">    [<span class="keyword">copy</span> addObject:<span class="string">@""</span>];</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (![<span class="keyword">copy</span> isEqualToArray:lines])</div><div class="line">        [[<span class="keyword">copy</span> componentsJoinedByString:<span class="string">@"\n"</span>] writeToFile:@ SubstrateLaunchConfig_ atomically:<span class="literal">YES</span> encoding:<span class="built_in">NSNonLossyASCIIStringEncoding</span> error:&amp;error];</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里看到了安装程序对启动程序作了一些处理，位置是 <code>/etc/launchd.conf</code>。但在实机中并没有出现，但是相应的，我们有如下的发现：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">iPhone:/ root# cat /etc/rc.d/substrate</div><div class="line">#!/bin/bash</div><div class="line">exec /usr/bin/cynject 1 /Library/Frameworks/CydiaSubstrate.framework/Libraries/SubstrateLauncher.dylib</div></pre></td></tr></table></figure>
+<p>在系统开机时，系统会自动跑这个脚本，调用了 <code>cynject</code> 对 <code>SubstrateLauncher.dylib</code> 做处理。</p>
+<p>原来是在开机的时候作了一些动作，但是具体是什么动作，还需要继续挖掘。</p>
+<h3 id="cynjectcpp"><a class="markdownIt-Anchor" href="#cynjectcpp"></a> cynject.cpp</h3>
+<p>以下是其源代码</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"CydiaSubstrate.h"</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> *argv[])</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (argc != <span class="number">3</span>) &#123;</div><div class="line">        <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">"usage: %s &lt;pid&gt; &lt;dylib&gt;\n"</span>, argv[<span class="number">0</span>]);</div><div class="line">        <span class="keyword">return</span> <span class="number">1</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">pid_t</span> pid(strtoul(argv[<span class="number">1</span>], <span class="literal">NULL</span>, <span class="number">10</span>));</div><div class="line">    <span class="function"><span class="keyword">const</span> <span class="keyword">char</span> *<span class="title">library</span><span class="params">(argv[<span class="number">2</span>])</span></span>;</div><div class="line">    <span class="keyword">if</span> (!MSHookProcess(pid, library)) &#123;</div><div class="line">        <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">"MSHookProcess() failed.\n"</span>);</div><div class="line">        <span class="keyword">return</span> <span class="number">1</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>代码非常简单。其中展现了这个程序的用法，第一个参数是 pid，第二个参数是动态库路径。<br>
+核心调用了 <code>MSHookProcess</code> 函数。那么焦点就在这了。</p>
+<p>跳转到对应函数，该函数实现在 <code>DarwinInjector.cpp</code> 中。<br>
+到这里，从函数名到文件名，可以猜测，这个函数将动态库注入到了这个进程当中。<br>
+观察一下刚才那条命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">exec</span> /usr/bin/cynject 1 /Library/Frameworks/CydiaSubstrate.framework/Libraries/SubstrateLauncher.dylib</div></pre></td></tr></table></figure>
+<p>注入的程序被硬编码为 1 ，因为这个一定是 launchd 的 pid，而且这个进程在整个系统关机是不会消亡的，保证了注入代码的常驻。</p>
+<h2 id="结论"><a class="markdownIt-Anchor" href="#结论"></a> 结论</h2>
+<p>现在我们可以回答我们之前的疑问了。</p>
+<blockquote>
+<p><code>CyidaSubstrate</code> 是什么时候被加载的？</p>
+</blockquote>
+<p><code>CyidaSubstrate</code> 的加载时是在程序启动时，环境变量<code>DYLD_INSERT_LIBRARIES</code>被设置为 <code>SubstrateBootrap.dylib</code> 来保证 <code>Loader</code> 被加载。</p>
+<blockquote>
+<p><code>CydiaSubstrate</code> 是怎么注入到每一个 APP 中的？</p>
+</blockquote>
+<p>这个问题题的解答就在 Cydia 入侵了 <code>launchd</code> 进程，替换了它的 <code>posix_spawn</code> 函数，因为每一个进程都诞生于 <code>launchd</code>，<code>launchd</code> 利用 <code>posix_spawn</code> 中调用 <code>fork()</code> 来产生新的进程。而 Cydia 拦截这个入口的函数，这个时候将 <code>SubstrateBootstrap.dylib</code>注入到环境中，引导组件的加载。</p>
+<h2 id="extra"><a class="markdownIt-Anchor" href="#extra"></a> Extra</h2>
+<p>对于 Cydia 如何对各种东西进行 hook，之后会有下一篇文章进行探索。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/源码阅读/" rel="tag"># 源码阅读</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/算法上机实验-单源-点对最短距离/" rel="next" title="算法上机实验----单源+点对最短距离">
+                <i class="fa fa-chevron-left"></i> 算法上机实验----单源+点对最短距离
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/Cydia-的-Hook-原理/" rel="prev" title="Cydia 的 Hook 原理">
+                Cydia 的 Hook 原理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMTY4MS84MjQ1"></div>
+    </div>
+  
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="BluesJiang" />
+            
+              <p class="site-author-name" itemprop="name">BluesJiang</p>
+              <p class="site-description motion-element" itemprop="description">A site to share MY learning journey</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/bluesjiang" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#cydia-结构"><span class="nav-number">1.</span> <span class="nav-text"> Cydia 结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查找启动相关的代码"><span class="nav-number">2.</span> <span class="nav-text"> 查找启动相关的代码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#boostrapcpp"><span class="nav-number">2.1.</span> <span class="nav-text"> Boostrap.cpp</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#darwinloadercpp"><span class="nav-number">2.2.</span> <span class="nav-text"> DarwinLoader.cpp</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#darwinlaunchercpp"><span class="nav-number">2.3.</span> <span class="nav-text"> DarwinLauncher.cpp</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#寻找-substratelauncher-的启动源头"><span class="nav-number">3.</span> <span class="nav-text"> 寻找 SubstrateLauncher 的启动源头</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#extrainst_mm"><span class="nav-number">3.1.</span> <span class="nav-text"> extrainst_.mm</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cynjectcpp"><span class="nav-number">3.2.</span> <span class="nav-text"> cynject.cpp</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结论"><span class="nav-number">4.</span> <span class="nav-text"> 结论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#extra"><span class="nav-number">5.</span> <span class="nav-text"> Extra</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">BluesJiang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

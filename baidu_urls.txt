@@ -1,5 +1,5 @@
+https://bluesjiang.coding.me/Cydia-的-Hook-原理/
+https://bluesjiang.coding.me/CydiaSubstrate-引导过程/
 https://bluesjiang.coding.me/算法上机实验-单源-点对最短距离/
 https://bluesjiang.coding.me/算法上机实验-最近点对/
 https://bluesjiang.coding.me/算法上机实验-矩阵乘法/
-https://bluesjiang.coding.me/算法上机实验-各种排序算法/
-https://bluesjiang.coding.me/深度学习入门笔记-四-手写数字识别-Mnist数据集/
